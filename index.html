@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Electric Tracker</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  
+  <!-- 樣式定義
+    - 基礎樣式：確保頁面布局一致性
+    - RWD 斷點：576px, 768px, 992px, 1200px
+    - 深色模式：支援日/夜間切換
+    - 響應式表格：支援行動裝置橫向捲動
+    - 圖表RWD：確保圖表在各種螢幕尺寸下正確顯示
+    - 列印樣式：優化列印輸出格式
+  -->
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 0; }
+    .container {
+      width: 100%;
+      padding: 0 15px;
+      margin: 0 auto;
+    }
+    @media (min-width: 576px) { .container { max-width: 540px; } }
+    @media (min-width: 768px) { .container { max-width: 720px; } }
+    @media (min-width: 992px) { .container { max-width: 960px; } }
+    @media (min-width: 1200px) { .container { max-width: 1140px; } }
+
+    .dark-mode {
+      background-color: #1d1d1d !important;
+      color: #fff !important;
+    }
+    .dark-mode .card {
+      background-color: #2a2a2a !important;
+      color: #fff !important;
+    }
+    .dark-mode input, .dark-mode select, .dark-mode textarea {
+      background-color: #3a3a3a !important;
+      color: #fff !important;
+      border-color: #666 !important;
+    }
+    .dark-mode table {
+      color: #fff !important;
+    }
+    .dark-mode table th {
+      background-color: #444 !important;
+      color: #fff !important;
+    }
+    .dark-mode table td {
+      background-color: #2a2a2a !important;
+      color: #fff !important;
+      border-color: #444;
+    }
+    .dark-mode .btn, .dark-mode .btn-add, .dark-mode .btn-delete {
+      color: #fff !important;
+    }
+
+    #usageChart {
+      min-height: 300px;
+      width: 100% !important;
+    }
+    .card-chart {
+      position: relative;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+      .card { margin-bottom: 1rem; }
+      .table-container { overflow-x: auto; }
+      canvas { max-width: 100%; height: auto !important; }
+      .row { margin: 0 -10px; }
+      .col-md-4 { padding: 0 10px; }
+      .form-control { font-size: 16px; }
+      form .btn { width: 100%; margin-bottom: 10px; }
+      .d-flex { flex-direction: column; }
+      .d-flex .btn { margin: 5px 0; }
+      #usageChart { min-height: 250px; }
+    }
+
+    @media (min-width: 769px) and (max-width: 991px) {
+      .card { padding: 1.5rem !important; }
+      .table td, .table th { padding: 0.5rem; }
+      #usageChart { min-height: 280px; }
+    }
+
+    @media print {
+      .btn, .navbar { display: none !important; }
+      .card { border: none !important; box-shadow: none !important; }
+      body { font-size: 12pt; }
+      .table { font-size: 10pt; }
+    }
+
+    #loginPage, #dashboardPage { display: none; }
+    #loginPage.active, #dashboardPage.active { display: block; }
+  </style>
+</head>
+<body class="bg-light">
+  <div id="loginPage">
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+      <div class="card shadow-lg p-4 rounded-4" style="max-width: 400px; width: 100%;">
+        <h3 class="text-center mb-3"><i class="fas fa-bolt text-warning"></i> Smart Electric Tracker</h3>
+        
+        <form id="loginForm" class="login-form">
+          <div class="mb-3">
+            <label class="form-label">帳號</label>
+            <input type="text" id="loginUsername" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">密碼</label>
+            <input type="password" id="loginPassword" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">登入</button>
+          <p class="text-center mt-3">沒有帳號？ <a href="#" id="showRegister">註冊</a></p>
+        </form>
+        <form id="registerForm" class="register-form d-none">
+          <div class="mb-3">
+            <label class="form-label">建立帳號</label>
+            <input type="text" id="regUsername" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">密碼</label>
+            <input type="password" id="regPassword" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">確認密碼</label>
+            <input type="password" id="regConfirm" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-success w-100">註冊</button>
+          <p class="text-center mt-3">已有帳號？ <a href="#" id="showLogin">登入</a></p>
+        </form>
+
+        <div id="msgBox" class="mt-3 text-center text-danger fw-bold"></div>
+      </div>
+    </div>
+  </div>
+  <div id="dashboardPage">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Smart Electric Tracker</a>
+        <div class="d-flex">
+          <button id="toggleDark" class="btn btn-secondary me-2">🌙</button>
+          <button id="logoutBtn" class="btn btn-danger">登出</button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container my-4">
+      <h2 class="page-title">歡迎, <span id="userName"></span></h2>
+
+      <div class="mb-3 text-end">
+        <button id="deleteRecordsBtn" class="btn btn-outline-danger">刪除所有紀錄</button>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <div class="card shadow-sm p-3">
+            <h5>總電費</h5>
+            <p id="totalCost" class="fs-4 fw-bold">0 元</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow-sm p-3">
+            <h5>總用電量</h5>
+            <p id="totalUsage" class="fs-4 fw-bold">0 度</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow-sm p-3">
+            <h5>平均單價</h5>
+            <p id="avgPrice" class="fs-4 fw-bold">0 元/度</p>
+          </div>
+        </div>
+      </div>
+      <div class="card mb-4 p-3 shadow-sm">
+        <h5>新增電費紀錄</h5>
+        <form id="recordForm" class="row g-3">
+          <div class="col-md-4">
+            <input type="month" id="recordMonth" class="form-control" required>
+          </div>
+          <div class="col-md-4">
+            <input type="number" id="recordUsage" class="form-control" placeholder="用電量 (度)" required>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">新增</button>
+          </div>
+        </form>
+      </div>
+      <div class="card shadow-sm p-3 mb-4">
+        <h5>歷史紀錄</h5>
+        <div class="table-container">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>月份</th>
+                <th>用電量 (度)</th>
+                <th>總電費 (元)</th>
+                <th>平均單價 (元/度)</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="recordTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card shadow-sm p-3 mb-4 card-chart">
+        <h5>用電趨勢</h5>
+        <div style="position: relative; width: 100%;">
+          <canvas id="usageChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- 程式邏輯
+    功能模組：
+    1. 使用者認證：註冊、登入、登出
+    2. 電費紀錄管理：新增、刪除、列表顯示
+    3. 電費計算：累進電價計算
+    4. 數據視覺化：趨勢圖表
+    5. 介面控制：深色模式、頁面切換
+    
+    資料存儲：
+    - 使用 localStorage 儲存使用者資料與電費紀錄
+    - 資料結構：{
+        users: {
+          [username]: {
+            password: string,
+            records: Array<{month: string, usage: number}>
+          }
+        }
+      }
+  -->
+  <script>
+    // DOM 元素快取
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const showRegister = document.getElementById("showRegister");
+    const showLogin = document.getElementById("showLogin");
+    const msgBox = document.getElementById("msgBox");
+    const recordTableBody = document.getElementById("recordTableBody");
+    let users = {};
+    let records = [];
+
+    // 頁面切換控制：在登入頁和主控台之間切換
+    function showPage(pageId) {
+      document.querySelectorAll('#loginPage, #dashboardPage').forEach(page => page.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+    }
+
+    // 載入使用者資料：從 localStorage 讀取當前使用者的電費紀錄
+    function loadUserData() {
+      const currentUser = localStorage.getItem("currentUser");
+      users = JSON.parse(localStorage.getItem("users")) || {};
+      records = users[currentUser].records || [];
+      renderTable();
+    }
+
+    // 電費計算：台電累進電價計算
+    // brackets: 各級距用電量 [120, 330, 500, 700, 1000]
+    // rates: 對應費率 [1.78, 2.55, 3.80, 5.14, 6.44, 8.86]
+    function calculateElectricityCostTaiPower(usage) {
+      const brackets = [120, 330, 500, 700, 1000];
+      const rates = [1.78, 2.55, 3.80, 5.14, 6.44, 8.86];
+      let cost = 0;
+      for (let i = 0; i <= brackets.length; i++) {
+        const lower = i === 0 ? 0 : brackets[i - 1];
+        const upper = i < brackets.length ? brackets[i] : Infinity;
+        cost += Math.min(Math.max(usage - lower, 0), upper - lower) * rates[i];
+      }
+      return { total: cost };
+    }
+
+    // 更新圖表：根據最新的用電記錄更新趨勢圖
+    function updateChart() {
+      usageChart.data.labels = records.map(r => r.month);
+      usageChart.data.datasets[0].data = records.map(r => r.usage);
+      usageChart.update();
+    }
+
+    // 渲染表格：顯示電費記錄、計算總用量和平均單價
+    function renderTable() {
+      recordTableBody.innerHTML = "";
+      let totalCost = 0, totalUsage = 0;
+
+      records.forEach((rec, idx) => {
+        const { total } = calculateElectricityCostTaiPower(rec.usage);
+        totalCost += total;
+        totalUsage += rec.usage;
+        const avgPrice = rec.usage ? (total / rec.usage).toFixed(2) : 0;
+
+        recordTableBody.insertAdjacentHTML('beforeend', `
+          <tr>
+            <td>${rec.month}</td>
+            <td>${rec.usage}</td>
+            <td>${total.toFixed(2)}</td>
+            <td>${avgPrice}</td>
+            <td><span class="btn-delete" data-idx="${idx}">刪除</span></td>
+          </tr>
+        `);
+      });
+
+      document.getElementById("totalCost").textContent = totalCost.toFixed(2) + " 元";
+      document.getElementById("totalUsage").textContent = totalUsage + " 度";
+      document.getElementById("avgPrice").textContent = totalUsage ? (totalCost / totalUsage).toFixed(2) + " 元/度" : "0 元/度";
+      updateChart();
+    }
+
+    // 註冊表單切換
+    showRegister.addEventListener("click", e => {
+      e.preventDefault();
+      loginForm.classList.add("d-none");
+      registerForm.classList.remove("d-none");
+      msgBox.textContent = "";
+    });
+
+    // 登入表單切換
+    showLogin.addEventListener("click", e => {
+      e.preventDefault();
+      registerForm.classList.add("d-none");
+      loginForm.classList.remove("d-none");
+      msgBox.textContent = "";
+    });
+
+    // 使用者註冊處理
+    registerForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const username = document.getElementById("regUsername").value.trim();
+      const password = document.getElementById("regPassword").value;
+      const confirm = document.getElementById("regConfirm").value;
+
+      if (password !== confirm) {
+        msgBox.textContent = "密碼不一致";
+        return;
+      }
+
+      users = JSON.parse(localStorage.getItem("users")) || {};
+      if (users[username]) {
+        msgBox.textContent = "帳號已存在";
+        return;
+      }
+
+      users[username] = { password, records: [] };
+      localStorage.setItem("users", JSON.stringify(users));
+      msgBox.textContent = "註冊成功";
+      registerForm.reset();
+      registerForm.classList.add("d-none");
+      loginForm.classList.remove("d-none");
+    });
+
+    // 使用者登入處理
+    loginForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      users = JSON.parse(localStorage.getItem("users")) || {};
+
+      if (!users[username]) {
+        msgBox.textContent = "無此帳號";
+        return;
+      }
+      if (users[username].password !== password) {
+        msgBox.textContent = "密碼錯誤";
+        return;
+      }
+
+      localStorage.setItem("currentUser", username);
+      loginForm.reset();
+      document.getElementById("userName").textContent = username;
+      showPage('dashboardPage');
+      loadUserData();
+    });
+
+    // 登出處理
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("currentUser");
+      showPage('loginPage');
+    });
+
+    // 深色模式切換
+    document.getElementById("toggleDark").addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+    });
+
+    // 刪除所有電費紀錄
+    document.getElementById("deleteRecordsBtn").addEventListener("click", () => {
+      if (window.confirm("確定要刪除所有電費紀錄嗎？此操作無法復原。")) {
+        const currentUser = localStorage.getItem("currentUser");
+        records = [];
+        users[currentUser].records = records;
+        localStorage.setItem("users", JSON.stringify(users));
+        renderTable();
+      }
+    });
+
+    // 新增電費紀錄處理
+    document.getElementById("recordForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const month = document.getElementById("recordMonth").value;
+      const usage = parseFloat(document.getElementById("recordUsage").value);
+      records.push({ month, usage });
+      const currentUser = localStorage.getItem("currentUser");
+      users[currentUser].records = records;
+      localStorage.setItem("users", JSON.stringify(users));
+      renderTable();
+      e.target.reset();
+    });
+
+    // 刪除單筆電費紀錄
+    recordTableBody.addEventListener("click", e => {
+      if (e.target.classList.contains("btn-delete")) {
+        const idx = e.target.dataset.idx;
+        records.splice(idx, 1);
+        const currentUser = localStorage.getItem("currentUser");
+        users[currentUser].records = records;
+        localStorage.setItem("users", JSON.stringify(users));
+        renderTable();
+      }
+    });
+
+    // 圖表初始化：設置用電趨勢圖的配置
+    const ctx = document.getElementById("usageChart").getContext("2d");
+    const usageChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [{
+          label: "用電量 (度)",
+          data: [],
+          backgroundColor: "rgba(13,110,253,0.2)",
+          borderColor: "#0d6efd",
+          borderWidth: 2,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { 
+            beginAtZero: true,
+            ticks: { maxTicksLimit: 8 }
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+              minRotation: 45
+            }
+          }
+        },
+        plugins: {
+          legend: { position: 'top' }
+        }
+      }
+    });
+
+    // 初始化：檢查登入狀態並載入適當頁面
+    if (localStorage.getItem("currentUser")) {
+      document.getElementById("userName").textContent = localStorage.getItem("currentUser");
+      showPage('dashboardPage');
+      loadUserData();
+    } else {
+      showPage('loginPage');
+    }
+  </script>
+</body>
+</html>

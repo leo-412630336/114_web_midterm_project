@@ -1,0 +1,216 @@
+/* 全域設定 */
+* {
+  box-sizing: border-box;  /* 設定所有元素的盒模型為 border-box */
+}
+
+/* 基本頁面設定 */
+body {
+  margin: 0;  /* 移除預設邊距 */
+  padding: 0;  /* 移除預設內距 */
+}
+
+/* 容器基本樣式 */
+.container {
+  width: 100%;  /* 容器寬度為 100% */
+  padding-right: 15px;  /* 右側內距 */
+  padding-left: 15px;   /* 左側內距 */
+  margin-right: auto;   /* 右側自動邊距實現置中 */
+  margin-left: auto;    /* 左側自動邊距實現置中 */
+}
+/* RWD 容器寬度設定 */
+/* 小型裝置（平板，576px 以上） */
+@media (min-width: 576px) {
+  .container {
+    max-width: 540px;
+  }
+}
+
+/* 中型裝置（平板，768px 以上） */
+@media (min-width: 768px) {
+  .container {
+    max-width: 720px;
+  }
+}
+
+/* 大型裝置（桌面，992px 以上） */
+@media (min-width: 992px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+/* 特大型裝置（大型桌面，1200px 以上） */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+/* 平板和手機版面配置（768px 以下） */
+@media (max-width: 768px) {
+  /* 卡片元素樣式調整 */
+  .card {
+    margin-bottom: 1rem;  /* 增加卡片間距 */
+  }
+  
+  /* 表格容器橫向捲動設定 */
+  .table-container {
+    overflow-x: auto;  /* 允許表格橫向捲動 */
+  }
+
+  /* 圖表響應式設定 */
+  canvas {
+    max-width: 100%;  /* 圖表最大寬度 */
+    height: auto !important;  /* 自動調整高度 */
+  }
+  
+  /* 使用量圖表特定設定 */
+  #usageChart {
+    min-height: 300px;  /* 最小高度 */
+    width: 100% !important;  /* 強制寬度 100% */
+  }
+  
+  /* 圖表卡片容器樣式 */
+  .card-chart {
+    position: relative;
+    padding: 1rem;  /* 內部間距 */
+    margin-bottom: 1rem;  /* 底部間距 */
+  }
+    @media (max-width: 576px) {
+    #usageChart {
+      min-height: 250px;
+    }
+  }
+  
+  @media (min-width: 577px) and (max-width: 768px) {
+    #usageChart {
+      min-height: 280px;
+    }
+  }
+  
+  @media (min-width: 769px) {
+    #usageChart {
+      min-height: 300px;
+    }
+  }
+  
+  .row {
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+  
+  .col-md-4 {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+/* 深色模式樣式設定 */
+/* 基本背景和文字顏色 */
+.dark-mode {
+  background-color: #1d1d1d !important;  /* 深色背景 */
+  color: #ffffff !important;  /* 白色文字 */
+}
+
+/* 卡片元素深色樣式 */
+.dark-mode .card {
+  background-color: #2a2a2a !important;  /* 稍淺的深色背景 */
+  color: #ffffff !important;  /* 白色文字 */
+}
+
+/* 表單元素深色樣式 */
+.dark-mode input, .dark-mode select, .dark-mode textarea {
+  background-color: #3a3a3a !important;  /* 輸入框深色背景 */
+  color: #ffffff !important;  /* 白色文字 */
+  border-color: #666 !important;  /* 深灰色邊框 */
+}
+
+/* 表格深色樣式 */
+.dark-mode table {
+  color: #ffffff !important;  /* 表格文字顏色 */
+}
+
+/* 表格標題列深色樣式 */
+.dark-mode table th {
+  background-color: #444 !important;  /* 標題列背景 */
+  color: #ffffff !important;  /* 白色文字 */
+}
+
+/* 表格單元格深色樣式 */
+.dark-mode table td {
+  background-color: #2a2a2a !important;  /* 單元格背景 */
+  color: #ffffff !important;  /* 白色文字 */
+  border-color: #444;  /* 邊框顏色 */
+}
+
+/* 按鈕深色樣式 */
+.dark-mode .btn, .dark-mode .btn-add, .dark-mode .btn-delete {
+  color: #ffffff !important;  /* 按鈕文字顏色 */
+}
+
+
+/* 手機版面配置（576px 以下） */
+@media (max-width: 576px) {
+  /* 表單控制項樣式 */
+  .form-control {
+    font-size: 16px;  /* 適合觸控的文字大小 */
+  }
+  
+  /* 按鈕樣式 */
+  form .btn {
+    width: 100%;  /* 按鈕佔滿寬度 */
+    margin-bottom: 10px;  /* 底部間距 */
+  }
+  
+  /* Flex 容器調整 */
+  .d-flex {
+    flex-direction: column;  /* 改為垂直排列 */
+  }
+  
+  /* Flex 內按鈕樣式 */
+  .d-flex .btn {
+    margin: 5px 0;  /* 垂直間距 */
+  }
+}
+
+/* 極小螢幕裝置（400px 以下） */
+@media (max-width: 400px) {
+  .card {
+    margin: 10px;  /* 卡片外間距 */
+    padding: 15px !important;  /* 卡片內間距 */
+  }
+}
+
+/* 平板橫向模式（768px 到 991px） */
+@media (min-width: 768px) and (max-width: 991px) {
+  .card {
+    padding: 1.5rem !important;  /* 卡片內間距 */
+  }
+  
+  /* 表格單元格間距 */
+  .table td, .table th {
+    padding: 0.5rem;  /* 縮小表格間距 */
+  }
+}
+
+/* 列印模式樣式 */
+@media print {
+  /* 隱藏不需要列印的元素 */
+  .btn, .navbar {
+    display: none !important;  /* 隱藏按鈕和導航列 */
+  }
+  
+  /* 移除卡片視覺效果 */
+  .card {
+    border: none !important;  /* 移除邊框 */
+    box-shadow: none !important;  /* 移除陰影 */
+  }
+  
+  /* 列印文字大小調整 */
+  body {
+    font-size: 12pt;  /* 內文字體大小 */
+  }
+  
+  /* 表格列印樣式 */
+  .table {
+    font-size: 10pt;  /* 表格字體大小 */
+  }
+}
