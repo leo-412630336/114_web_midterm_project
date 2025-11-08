@@ -1,250 +1,17 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Electric Tracker</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; padding: 0; }
-    .container {
-      width: 100%;
-      padding: 0 15px;
-      margin: 0 auto;
-    }
-    @media (min-width: 576px) { .container { max-width: 540px; } }
-    @media (min-width: 768px) { .container { max-width: 720px; } }
-    @media (min-width: 992px) { .container { max-width: 960px; } }
-    @media (min-width: 1200px) { .container { max-width: 1140px; } }
-
-    .dark-mode {
-      background-color: #1d1d1d !important;
-      color: #fff !important;
-    }
-    .dark-mode .card {
-      background-color: #2a2a2a !important;
-      color: #fff !important;
-    }
-    .dark-mode input, .dark-mode select, .dark-mode textarea {
-      background-color: #3a3a3a !important;
-      color: #fff !important;
-      border-color: #666 !important;
-    }
-    .dark-mode table {
-      color: #fff !important;
-    }
-    .dark-mode table th {
-      background-color: #444 !important;
-      color: #fff !important;
-    }
-    .dark-mode table td {
-      background-color: #2a2a2a !important;
-      color: #fff !important;
-      border-color: #444;
-    }
-    .dark-mode .btn, .dark-mode .btn-add, .dark-mode .btn-delete {
-      color: #fff !important;
-    }
-
-    #usageChart {
-      min-height: 300px;
-      width: 100% !important;
-    }
-    .card-chart {
-      position: relative;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-    
-    @media (max-width: 768px) {
-      .card { margin-bottom: 1rem; }
-      .table-container { overflow-x: auto; }
-      canvas { max-width: 100%; height: auto !important; }
-      .row { margin: 0 -10px; }
-      .col-md-3 { width: 50%; padding: 0 10px; } 
-      .col-md-4 { padding: 0 10px; }
-      .form-control { font-size: 16px; }
-      form .btn { width: 100%; margin-bottom: 10px; }
-      .d-flex { flex-direction: column; }
-      .d-flex .btn { margin: 5px 0; }
-      #usageChart { min-height: 250px; }
-    }
-
-    @media (min-width: 769px) and (max-width: 991px) {
-      .card { padding: 1.5rem !important; }
-      .table td, .table th { padding: 0.5rem; }
-      #usageChart { min-height: 280px; }
-    }
-
-    @media print {
-      .btn, .navbar { display: none !important; }
-      .card { border: none !important; box-shadow: none !important; }
-      body { font-size: 12pt; }
-      .table { font-size: 10pt; }
-    }
-
-    #loginPage, #dashboardPage { display: none; }
-    #loginPage.active, #dashboardPage.active { display: block; }
-    
-    .usage-low {
-      background-color: rgba(25, 135, 84, 0.1) !important; 
-    }
-    .usage-medium {
-      background-color: rgba(255, 193, 7, 0.1) !important; 
-    }
-    .usage-high {
-      background-color: rgba(220, 53, 69, 0.1) !important; 
-    }
-
-    .dark-mode .usage-low {
-      background-color: rgba(25, 135, 84, 0.3) !important;
-    }
-    .dark-mode .usage-medium {
-      background-color: rgba(255, 193, 7, 0.2) !important;
-    }
-    .dark-mode .usage-high {
-      background-color: rgba(220, 53, 69, 0.3) !important;
-    }
-  </style>
-</head>
-<body class="bg-light">
-  <div id="loginPage">
-    <div class="container d-flex justify-content-center align-items-center vh-100">
-      <div class="card shadow-lg p-4 rounded-4" style="max-width: 400px; width: 100%;">
-        <h3 class="text-center mb-3"><i class="fa-solid fa-bolt text-warning"></i> Smart Electric Tracker</h3>
-        
-        <form id="loginForm" class="login-form">
-          <div class="mb-3">
-            <label class="form-label">帳號</label>
-            <input type="text" id="loginUsername" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">密碼</label>
-            <input type="password" id="loginPassword" class="form-control" required>
-          </div>
-          <button type="submit" class="btn btn-primary w-100">登入</button>
-          <p class="text-center mt-3">沒有帳號？ <a href="#" id="showRegister">註冊</a></p>
-        </form>
-        <form id="registerForm" class="register-form d-none">
-          <div class="mb-3">
-            <label class="form-label">建立帳號</label>
-            <input type="text" id="regUsername" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">密碼</label>
-            <input type="password" id="regPassword" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">確認密碼</label>
-            <input type="password" id="regConfirm" class="form-control" required>
-          </div>
-          <button type="submit" class="btn btn-success w-100">註冊</button>
-          <p class="text-center mt-3">已有帳號？ <a href="#" id="showLogin">登入</a></p>
-        </form>
-
-        <div id="msgBox" class="mt-3 text-center text-danger fw-bold"></div>
-      </div>
-    </div>
-  </div>
-  <div id="dashboardPage">
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #28a745;">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">電價計算</a>
-    <div class="d-flex">
-      <button id="toggleDark" class="btn btn-secondary me-2">🌙</button>
-      <button id="logoutBtn" class="btn btn-danger">登出</button>
-    </div>
-  </div>
-</nav>
-
-    <div class="container my-4">
-      <h2 class="page-title">歡迎, <span id="userName"></span></h2>
-
-      <div class="card shadow-sm p-3 mb-4 bg-success-subtle border-success">
-        <h5><i class="fa-solid fa-leaf"></i> 節能小提示</h5>
-        <p id="tipOfTheDay" class="mb-0">隨手關燈，節省能源。</p>
-      </div>
-      <div class="mb-3 text-end">
-        <button id="deleteRecordsBtn" class="btn btn-outline-danger">刪除所有紀錄</button>
-      </div>
-
-      <div class="row mb-4">
-        <div class="col-md-3 col-6"> <div class="card shadow-sm p-3">
-            <h5>總電費</h5>
-            <p id="totalCost" class="fs-4 fw-bold">0 元</p>
-          </div>
-        </div>
-        <div class="col-md-3 col-6"> <div class="card shadow-sm p-3">
-            <h5>總用電量</h5>
-            <p id="totalUsage" class="fs-4 fw-bold">0 度</p>
-          </div>
-        </div>
-        <div class="col-md-3 col-6"> <div class="card shadow-sm p-3">
-            <h5>平均單價</h5>
-            <p id="avgPrice" class="fs-4 fw-bold">0 元/度</p>
-          </div>
-        </div>
-        <div class="col-md-3 col-6"> <div class="card shadow-sm p-3">
-            <h5>總碳排放</h5>
-            <p id="totalCO2" class="fs-4 fw-bold">0 kg</p>
-          </div>
-        </div>
-        </div>
-      
-      <div class="card mb-4 p-3 shadow-sm">
-        <h5>新增電費紀錄</h5>
-        <form id="recordForm" class="row g-3">
-          <div class="col-md-4">
-            <input type="month" id="recordMonth" class="form-control" required>
-          </div>
-          <div class="col-md-4">
-            <input type="number" id="recordUsage" class="form-control" placeholder="用電量 (度)" required>
-          </div>
-          <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">新增</button>
-          </div>
-        </form>
-      </div>
-      <div class="card shadow-sm p-3 mb-4">
-        <h5>歷史紀錄</h5>
-        <div class="table-container">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>月份</th>
-                <th>用電量 (度)</th>
-                <th>總電費 (元)</th>
-                <th>平均單價 (元/度)</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody id="recordTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="card shadow-sm p-3 mb-4 card-chart">
-        <h5>用電趨勢</h5>
-        <div style="position: relative; width: 100%;">
-          <canvas id="usageChart"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
-
-    <script>
+<script>
+    /* --- DOM 元素選取 --- */
     const loginForm = document.getElementById("loginForm");
     const registerForm = document.getElementById("registerForm");
     const showRegister = document.getElementById("showRegister");
     const showLogin = document.getElementById("showLogin");
     const msgBox = document.getElementById("msgBox");
     const recordTableBody = document.getElementById("recordTableBody");
-    let users = {};
-    let records = [];
+    
+    /* --- 全域變數 --- */
+    let users = {}; // 用於儲存所有使用者資料
+    let records = []; // 用於儲存目前登入者的電費紀錄
 
+    /* --- 靜態資料：節能小提示 --- */
     const energyTips = [
       "隨手關燈，拔掉不用的電器插頭。",
       "將冷氣溫度設定在 26-28 度，搭配電扇使用更省電。",
@@ -255,6 +22,7 @@
       "冰箱不要塞太滿，並減少開關門次數。"
     ];
 
+    /* --- 功能：顯示隨機節能小提示 --- */
     function showRandomTip() {
       const tipElement = document.getElementById("tipOfTheDay");
       if (tipElement) {
@@ -263,23 +31,33 @@
       }
     }
 
+    /* --- 功能：切換頁面 (SPA 核心) --- */
+    // 透過切換 'active' class 來顯示或隱藏登入頁面或儀表板
     function showPage(pageId) {
       document.querySelectorAll('#loginPage, #dashboardPage').forEach(page => page.classList.remove('active'));
       document.getElementById(pageId).classList.add('active');
     }
 
+    /* --- 功能：載入並初始化使用者資料 --- */
     function loadUserData() {
       const currentUser = localStorage.getItem("currentUser");
       users = JSON.parse(localStorage.getItem("users")) || {};
+      // 從全域 users 物件中，取得當前使用者的 records
       records = users[currentUser].records || [];
+      
+      // 載入資料後，重新渲染表格和圖表
       renderTable();
-      showRandomTip(); 
+      // 顯示一則隨機小提示
+      showRandomTip();
     }
 
+    /* --- 功能：計算台電電費 (累進費率) --- */
+    // 根據台灣的累進費率計算電費
     function calculateElectricityCostTaiPower(usage) {
-      const brackets = [120, 330, 500, 700, 1000];
-      const rates = [1.78, 2.55, 3.80, 5.14, 6.44, 8.86];
+      const brackets = [120, 330, 500, 700, 1000]; // 用電級距
+      const rates = [1.78, 2.55, 3.80, 5.14, 6.44, 8.86]; // 對應費率
       let cost = 0;
+      // 遍歷所有級距來計算總電費
       for (let i = 0; i <= brackets.length; i++) {
         const lower = i === 0 ? 0 : brackets[i - 1];
         const upper = i < brackets.length ? brackets[i] : Infinity;
@@ -288,30 +66,38 @@
       return { total: cost };
     }
 
+    /* --- 功能：更新 Chart.js 圖表 --- */
     function updateChart() {
+      // 將 records 陣列資料轉換為圖表需要的格式
       usageChart.data.labels = records.map(r => r.month);
       usageChart.data.datasets[0].data = records.map(r => r.usage);
+      // 更新圖表
       usageChart.update();
     }
 
+    /* --- 功能：渲染表格 & 更新儀表板統計 --- */
+    // 這是核心功能，負責計算、顯示所有資料
     function renderTable() {
-      recordTableBody.innerHTML = "";
+      recordTableBody.innerHTML = ""; // 清空表格
       let totalCost = 0, totalUsage = 0;
-      const co2Factor = 0.495; 
+      const co2Factor = 0.495; // 碳排放係數 (kg CO2 / 度)
 
+      // 遍歷所有紀錄
       records.forEach((rec, idx) => {
-        const { total } = calculateElectricityCostTaiPower(rec.usage);
-        totalCost += total;
-        totalUsage += rec.usage;
-        const avgPrice = rec.usage ? (total / rec.usage).toFixed(2) : 0;
+        const { total } = calculateElectricityCostTaiPower(rec.usage); // 計算單筆電費
+        totalCost += total; // 累加總電費
+        totalUsage += rec.usage; // 累加總用電
+        const avgPrice = rec.usage ? (total / rec.usage).toFixed(2) : 0; // 計算平均單價
 
-        let usageClass = 'usage-low'; 
-        if (rec.usage > 700) { 
+        // 根據用電量高低，給予不同的 class (用於 CSS 上色)
+        let usageClass = 'usage-low';
+        if (rec.usage > 700) {
           usageClass = 'usage-high';
-        } else if (rec.usage > 330) { 
+        } else if (rec.usage > 330) {
           usageClass = 'usage-medium';
         }
         
+        // 將組合好的 HTML 插入表格中
         recordTableBody.insertAdjacentHTML('beforeend', `
           <tr class="${usageClass}">
             <td>${rec.month}</td>
@@ -323,16 +109,20 @@
         `);
       });
 
+      // 更新儀表板頂端的四個統計卡片
       document.getElementById("totalCost").textContent = totalCost.toFixed(2) + " 元";
       document.getElementById("totalUsage").textContent = totalUsage + " 度";
       document.getElementById("avgPrice").textContent = totalUsage ? (totalCost / totalUsage).toFixed(2) + " 元/度" : "0 元/度";
       
+      // 計算並更新總碳排放
       const totalCO2 = totalUsage * co2Factor;
       document.getElementById("totalCO2").textContent = totalCO2.toFixed(2) + " kg";
       
+      // 最後，更新圖表
       updateChart();
     }
 
+    /* --- 事件監聽：點擊「註冊」連結 --- */
     showRegister.addEventListener("click", e => {
       e.preventDefault();
       loginForm.classList.add("d-none");
@@ -340,6 +130,7 @@
       msgBox.textContent = "";
     });
 
+    /* --- 事件監聽：點擊「登入」連結 --- */
     showLogin.addEventListener("click", e => {
       e.preventDefault();
       registerForm.classList.add("d-none");
@@ -347,6 +138,7 @@
       msgBox.textContent = "";
     });
 
+    /* --- 事件監聽：註冊表單提交 --- */
     registerForm.addEventListener("submit", e => {
       e.preventDefault();
       const username = document.getElementById("regUsername").value.trim();
@@ -364,14 +156,18 @@
         return;
       }
 
+      // 建立使用者並包含空紀錄陣列
       users[username] = { password, records: [] };
       localStorage.setItem("users", JSON.stringify(users));
       msgBox.textContent = "註冊成功";
+      
+      // 註冊成功後，自動切換回登入表單
       registerForm.reset();
       registerForm.classList.add("d-none");
       loginForm.classList.remove("d-none");
     });
 
+    /* --- 事件監聽：登入表單提交 --- */
     loginForm.addEventListener("submit", e => {
       e.preventDefault();
       const username = document.getElementById("loginUsername").value.trim();
@@ -387,97 +183,123 @@
         return;
       }
 
+      // 登入成功：儲存使用者，並切換到儀表板頁面
       localStorage.setItem("currentUser", username);
       loginForm.reset();
       document.getElementById("userName").textContent = username;
       showPage('dashboardPage');
+      
+      // 載入該使用者的資料
       loadUserData();
     });
 
+    /* --- 事件監聽：點擊「登出」按鈕 --- */
     document.getElementById("logoutBtn").addEventListener("click", () => {
       localStorage.removeItem("currentUser");
-      showPage('loginPage');
+      showPage('loginPage'); // 切換回登入頁面
     });
 
+    /* --- 事件監聽：點擊「切換深色模式」按鈕 --- */
     document.getElementById("toggleDark").addEventListener("click", () => {
       document.body.classList.toggle("dark-mode");
     });
 
+    /* --- 事件監聽：點擊「刪除所有紀錄」按鈕 --- */
     document.getElementById("deleteRecordsBtn").addEventListener("click", () => {
+      // 顯示確認對話框
       if (window.confirm("確定要刪除所有電費紀錄嗎？此操作無法復原。")) {
         const currentUser = localStorage.getItem("currentUser");
-        records = [];
-        users[currentUser].records = records;
-        localStorage.setItem("users", JSON.stringify(users));
-        renderTable();
+        records = []; // 清空記憶體中的紀錄
+        users[currentUser].records = records; // 更新全域 users 物件
+        localStorage.setItem("users", JSON.stringify(users)); // 寫回 localStorage
+        renderTable(); // 重新渲染表格 (變為空白)
       }
     });
 
+    /* --- 事件監聽：新增紀錄表單提交 --- */
     document.getElementById("recordForm").addEventListener("submit", e => {
       e.preventDefault();
       const month = document.getElementById("recordMonth").value;
       const usage = parseFloat(document.getElementById("recordUsage").value);
+      
+      // 新增資料到記憶體中的 records 陣列
       records.push({ month, usage });
+      
+      // 更新 localStorage
       const currentUser = localStorage.getItem("currentUser");
       users[currentUser].records = records;
       localStorage.setItem("users", JSON.stringify(users));
-      renderTable();
-      e.target.reset();
-      showRandomTip(); 
+      
+      renderTable(); // 重新渲染表格
+      e.target.reset(); // 重設表單
+      showRandomTip(); // 新增後顯示新的提示
     });
 
+    /* --- 事件監聽：點擊表格中的「刪除」 --- */
+    // 這是「事件委派」(Event Delegation)，監聽整個 tbody
     recordTableBody.addEventListener("click", e => {
+      // 判斷被點擊的是否為「刪除」按鈕
       if (e.target.classList.contains("btn-delete")) {
-        const idx = e.target.dataset.idx;
+        const idx = e.target.dataset.idx; // 獲取 data-idx 屬性
+        
+        // 從陣列中刪除該筆資料
         records.splice(idx, 1);
+        
+        // 更新 localStorage
         const currentUser = localStorage.getItem("currentUser");
         users[currentUser].records = records;
         localStorage.setItem("users", JSON.stringify(users));
-        renderTable();
+        
+        renderTable(); // 重新渲染表格
       }
     });
 
+    /* --- Chart.js 圖表初始化 --- */
     const ctx = document.getElementById("usageChart").getContext("2d");
     const usageChart = new Chart(ctx, {
-      type: "line",
+      type: "line", // 設定為折線圖
       data: {
-        labels: [],
+        labels: [], // 初始為空，將由 renderTable() 填入
         datasets: [{
           label: "用電量 (度)",
-          data: [],
+          data: [], // 初始為空
           backgroundColor: "rgba(13,110,253,0.2)",
           borderColor: "#0d6efd",
           borderWidth: 2,
-          fill: true
+          fill: true // 顯示線條下方的顏色
         }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, // 響應式
+        maintainAspectRatio: false, // 允許圖表不按原比例縮放
         scales: {
-          y: { 
+          y: { // Y 軸設定
             beginAtZero: true,
             ticks: { maxTicksLimit: 8 }
           },
-          x: {
+          x: { // X 軸設定
             ticks: {
-              maxRotation: 45,
+              maxRotation: 45, // 標籤旋轉 45 度，防止重疊
               minRotation: 45
             }
           }
         },
         plugins: {
-          legend: { position: 'top' }
+          legend: { position: 'top' } // 圖例顯示在頂部
         }
       }
     });
 
+    /* --- 程式進入點：檢查是否已登入 --- */
+    // 當頁面載入時，檢查 localStorage 是否有 'currentUser'
     if (localStorage.getItem("currentUser")) {
+      // 如果有，表示已登入
       document.getElementById("userName").textContent = localStorage.getItem("currentUser");
-      showPage('dashboardPage');
-      loadUserData();
+      showPage('dashboardPage'); // 顯示儀表板
+      loadUserData(); // 載入使用者資料
     } else {
-      showPage('loginPage');
+      // 如果沒有，表示未登入
+      showPage('loginPage'); // 顯示登入頁面
     }
   </script>
 </body>

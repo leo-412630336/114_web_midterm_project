@@ -1,19 +1,25 @@
+/* --- 全域 Box Sizing --- */
+/* 讓所有元素的寬高計算包含 padding 和 border */
 * {
-  box-sizing: border-box;  
+  box-sizing: border-box;
 }
 
+/* --- Body 基礎樣式 --- */
 body {
-  margin: 0;  
-  padding: 0;  
+  margin: 0;
+  padding: 0;
 }
 
+/* --- 響應式容器 (類似 Bootstrap) --- */
+/* 這是用來包裹主要內容的容器，會自動置中 */
 .container {
-  width: 100%;  
-  padding-right: 15px;  
-  padding-left: 15px;   
-  margin-right: auto;   
-  margin-left: auto;    
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
 }
+/* --- 容器在不同螢幕尺寸下的最大寬度 (斷點) --- */
 @media (min-width: 576px) {
   .container {
     max-width: 540px;
@@ -37,31 +43,40 @@ body {
     max-width: 1140px;
   }
 }
+
+/* --- 響應式樣式 (中型裝置以下) --- */
 @media (max-width: 768px) {
+  /* 卡片底部增加間距 */
   .card {
-    margin-bottom: 1rem;  
+    margin-bottom: 1rem;
   }
   
+  /* 表格容器允許水平滾動，防止表格過寬破版 */
   .table-container {
-    overflow-x: auto;  
+    overflow-x: auto;
   }
 
+  /* 圖表畫布設定 */
   canvas {
-    max-width: 100%;  
-    height: auto !important;  
+    max-width: 100%;
+    height: auto !important;
   }
   
+  /* 圖表最小高度設定 */
   #usageChart {
-    min-height: 300px;  
-    width: 100% !important;  
+    min-height: 300px;
+    width: 100% !important;
   }
   
+  /* 圖表卡片樣式 */
   .card-chart {
     position: relative;
-    padding: 1rem;  
-    margin-bottom: 1rem;  
+    padding: 1rem;
+    margin-bottom: 1rem;
   }
-    @media (max-width: 576px) {
+
+  /* --- 圖表在不同小尺寸下的最小高度調整 --- */
+  @media (max-width: 576px) {
     #usageChart {
       min-height: 250px;
     }
@@ -79,6 +94,7 @@ body {
     }
   }
   
+  /* 調整網格系統的間距 */
   .row {
     margin-left: -10px;
     margin-right: -10px;
@@ -89,93 +105,116 @@ body {
     padding-right: 10px;
   }
 }
+
+/* --- 深色模式 (Dark Mode) 樣式 --- */
+/* 當 body 標籤有 .dark-mode class 時觸發 */
 .dark-mode {
-  background-color: #1d1d1d !important;  
-  color: #ffffff !important;  
+  background-color: #1d1d1d !important;
+  color: #ffffff !important;
 }
 
+/* 深色模式下的卡片 */
 .dark-mode .card {
-  background-color: #2a2a2a !important;  
-  color: #ffffff !important;  
+  background-color: #2a2a2a !important;
+  color: #ffffff !important;
 }
 
+/* 深色模式下的表單元素 */
 .dark-mode input, .dark-mode select, .dark-mode textarea {
-  background-color: #3a3a3a !important;  
-  color: #ffffff !important;  
-  border-color: #666 !important;  
+  background-color: #3a3a3a !important;
+  color: #ffffff !important;
+  border-color: #666 !important;
 }
 
+/* 深色模式下的表格文字 */
 .dark-mode table {
-  color: #ffffff !important;  
+  color: #ffffff !important;
 }
 
+/* 深色模式下的表格標頭 */
 .dark-mode table th {
-  background-color: #444 !important;  
-  color: #ffffff !important;  
+  background-color: #444 !important;
+  color: #ffffff !important;
 }
 
+/* 深色模式下的表格儲存格 */
 .dark-mode table td {
-  background-color: #2a2a2a !important;  
-  color: #ffffff !important;  
-  border-color: #444;  
+  background-color: #2a2a2a !important;
+  color: #ffffff !important;
+  border-color: #444;
 }
 
+/* 深色模式下的按鈕文字 */
 .dark-mode .btn, .dark-mode .btn-add, .dark-mode .btn-delete {
-  color: #ffffff !important;  
+  color: #ffffff !important;
 }
 
 
+/* --- 響應式樣式 (小型裝置) --- */
 @media (max-width: 576px) {
+  /* 放大表單字體，方便手機輸入 */
   .form-control {
-    font-size: 16px;  
+    font-size: 16px;
   }
   
+  /* 按鈕改為滿版 */
   form .btn {
-    width: 100%;  
-    margin-bottom: 10px;  
+    width: 100%;
+    margin-bottom: 10px;
   }
   
+  /* d-flex 元素改為垂直排列 */
   .d-flex {
-    flex-direction: column;  
+    flex-direction: column;
   }
   
   .d-flex .btn {
-    margin: 5px 0;  
+    margin: 5px 0;
   }
 }
 
+/* --- 響應式樣式 (超小型裝置) --- */
 @media (max-width: 400px) {
+  /* 減少卡片邊距 */
   .card {
-    margin: 10px;  
-    padding: 15px !important;  
+    margin: 10px;
+    padding: 15px !important;
   }
 }
 
+/* --- 響應式樣式 (平板電腦) --- */
 @media (min-width: 768px) and (max-width: 991px) {
+  /* 增加卡片內距 */
   .card {
-    padding: 1.5rem !important;  
+    padding: 1.5rem !important;
   }
   
+  /* 減少表格內距 */
   .table td, .table th {
-    padding: 0.5rem;  
+    padding: 0.5rem;
   }
 }
 
+/* --- 列印 (Print) 樣式 --- */
+/* 設定列印時的頁面外觀 */
 @media print {
+  /* 隱藏按鈕和導覽列 */
   .btn, .navbar {
-    display: none !important;  
+    display: none !important;
   }
   
+  /* 移除卡片陰影和邊框 */
   .card {
-    border: none !important;  
-    box-shadow: none !important;  
+    border: none !important;
+    box-shadow: none !important;
   }
   
+  /* 調整列印字體大小 */
   body {
-    font-size: 12pt;  
+    font-size: 12pt;
   }
   
   .table {
-    font-size: 10pt;  
+    font-size: 10pt;
   }
 }
