@@ -1,4 +1,4 @@
-/* --- DOM 元素選取 --- */
+/*DOM 元素選取*/
 // 獲取登入表單
 const loginForm = document.getElementById("loginForm");
 // 獲取註冊表單
@@ -10,7 +10,7 @@ const showLogin = document.getElementById("showLogin");
 // 獲取顯示錯誤/成功訊息的區塊
 const msgBox = document.getElementById("msgBox");
 
-/* --- 事件監聽：點擊「顯示註冊」連結 --- */
+/*事件監聽：點擊「顯示註冊」連結*/
 // 檢查元素是否存在
 if (showRegister) {
   // 綁定點擊事件
@@ -22,7 +22,7 @@ if (showRegister) {
   });
 }
 
-/* --- 事件監聽：點擊「顯示登入」連結 --- */
+/*事件監聽：點擊「顯示登入」連結*/
 if (showLogin) {
   showLogin.addEventListener("click", (e) => {
     e.preventDefault(); // 防止連結跳轉
@@ -32,7 +32,7 @@ if (showLogin) {
   });
 }
 
-/* --- 事件監聽：註冊表單提交 --- */
+/*事件監聽：註冊表單提交*/
 if (registerForm) {
   registerForm.addEventListener("submit", (e) => {
     e.preventDefault(); // 防止表單預設提交
@@ -74,7 +74,7 @@ if (registerForm) {
   });
 }
 
-/* --- 事件監聽：登入表單提交 --- */
+/*事件監聽：登入表單提交*/
 if (loginForm) {
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault(); // 防止表單預設提交

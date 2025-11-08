@@ -1,16 +1,16 @@
-/* --- 全域 Box Sizing --- */
+/*全域 Box Sizing*/
 /* 讓所有元素的寬高計算包含 padding 和 border */
 * {
   box-sizing: border-box;
 }
 
-/* --- Body 基礎樣式 --- */
+/* Body 基礎樣式 */
 body {
   margin: 0;
   padding: 0;
 }
 
-/* --- 響應式容器 (類似 Bootstrap) --- */
+/* 響應式容器 (類似 Bootstrap) */
 /* 這是用來包裹主要內容的容器，會自動置中 */
 .container {
   width: 100%;
@@ -19,7 +19,7 @@ body {
   margin-right: auto;
   margin-left: auto;
 }
-/* --- 容器在不同螢幕尺寸下的最大寬度 (斷點) --- */
+/* 容器在不同螢幕尺寸下的最大寬度 */
 @media (min-width: 576px) {
   .container {
     max-width: 540px;
@@ -44,7 +44,7 @@ body {
   }
 }
 
-/* --- 響應式樣式 (中型裝置以下) --- */
+/*  響應式樣式 (中型裝置以下) */
 @media (max-width: 768px) {
   /* 卡片底部增加間距 */
   .card {
@@ -75,7 +75,7 @@ body {
     margin-bottom: 1rem;
   }
 
-  /* --- 圖表在不同小尺寸下的最小高度調整 --- */
+  /* 圖表在不同小尺寸下的最小高度調整 */
   @media (max-width: 576px) {
     #usageChart {
       min-height: 250px;
@@ -106,7 +106,7 @@ body {
   }
 }
 
-/* --- 深色模式 (Dark Mode) 樣式 --- */
+/* 深色模式 (Dark Mode) 樣式 */
 /* 當 body 標籤有 .dark-mode class 時觸發 */
 .dark-mode {
   background-color: #1d1d1d !important;
@@ -150,7 +150,7 @@ body {
 }
 
 
-/* --- 響應式樣式 (小型裝置) --- */
+/* 響應式樣式 (小型裝置) */
 @media (max-width: 576px) {
   /* 放大表單字體，方便手機輸入 */
   .form-control {
@@ -173,7 +173,7 @@ body {
   }
 }
 
-/* --- 響應式樣式 (超小型裝置) --- */
+/* 響應式樣式 (超小型裝置) */
 @media (max-width: 400px) {
   /* 減少卡片邊距 */
   .card {
@@ -182,7 +182,7 @@ body {
   }
 }
 
-/* --- 響應式樣式 (平板電腦) --- */
+/* 響應式樣式 (平板電腦) */
 @media (min-width: 768px) and (max-width: 991px) {
   /* 增加卡片內距 */
   .card {
@@ -195,7 +195,7 @@ body {
   }
 }
 
-/* --- 列印 (Print) 樣式 --- */
+/* 列印 (Print) 樣式 */
 /* 設定列印時的頁面外觀 */
 @media print {
   /* 隱藏按鈕和導覽列 */

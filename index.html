@@ -1,5 +1,5 @@
 <script>
-    /* --- DOM 元素選取 --- */
+    /*DOM 元素選取*/
     const loginForm = document.getElementById("loginForm");
     const registerForm = document.getElementById("registerForm");
     const showRegister = document.getElementById("showRegister");
@@ -7,11 +7,11 @@
     const msgBox = document.getElementById("msgBox");
     const recordTableBody = document.getElementById("recordTableBody");
     
-    /* --- 全域變數 --- */
+    /*全域變數*/
     let users = {}; // 用於儲存所有使用者資料
     let records = []; // 用於儲存目前登入者的電費紀錄
 
-    /* --- 靜態資料：節能小提示 --- */
+    /*靜態資料：節能小提示*/
     const energyTips = [
       "隨手關燈，拔掉不用的電器插頭。",
       "將冷氣溫度設定在 26-28 度，搭配電扇使用更省電。",
@@ -31,14 +31,14 @@
       }
     }
 
-    /* --- 功能：切換頁面 (SPA 核心) --- */
+    /*功能：切換頁面 (SPA 核心)*/
     // 透過切換 'active' class 來顯示或隱藏登入頁面或儀表板
     function showPage(pageId) {
       document.querySelectorAll('#loginPage, #dashboardPage').forEach(page => page.classList.remove('active'));
       document.getElementById(pageId).classList.add('active');
     }
 
-    /* --- 功能：載入並初始化使用者資料 --- */
+    /*功能：載入並初始化使用者資料*/
     function loadUserData() {
       const currentUser = localStorage.getItem("currentUser");
       users = JSON.parse(localStorage.getItem("users")) || {};
@@ -51,7 +51,7 @@
       showRandomTip();
     }
 
-    /* --- 功能：計算台電電費 (累進費率) --- */
+    /*功能：計算台電電費 (累進費率)*/
     // 根據台灣的累進費率計算電費
     function calculateElectricityCostTaiPower(usage) {
       const brackets = [120, 330, 500, 700, 1000]; // 用電級距
@@ -66,7 +66,7 @@
       return { total: cost };
     }
 
-    /* --- 功能：更新 Chart.js 圖表 --- */
+    /*功能：更新 Chart.js 圖表*/
     function updateChart() {
       // 將 records 陣列資料轉換為圖表需要的格式
       usageChart.data.labels = records.map(r => r.month);
@@ -75,12 +75,12 @@
       usageChart.update();
     }
 
-    /* --- 功能：渲染表格 & 更新儀表板統計 --- */
+    /*功能：渲染表格 & 更新儀表板統計*/
     // 這是核心功能，負責計算、顯示所有資料
     function renderTable() {
       recordTableBody.innerHTML = ""; // 清空表格
       let totalCost = 0, totalUsage = 0;
-      const co2Factor = 0.495; // 碳排放係數 (kg CO2 / 度)
+      const co2Factor = 0.495; // 碳排放係數 
 
       // 遍歷所有紀錄
       records.forEach((rec, idx) => {
@@ -122,7 +122,7 @@
       updateChart();
     }
 
-    /* --- 事件監聽：點擊「註冊」連結 --- */
+    /*事件監聽：點擊「註冊」連結*/
     showRegister.addEventListener("click", e => {
       e.preventDefault();
       loginForm.classList.add("d-none");
@@ -130,7 +130,7 @@
       msgBox.textContent = "";
     });
 
-    /* --- 事件監聽：點擊「登入」連結 --- */
+    /*事件監聽：點擊「登入」連結*/
     showLogin.addEventListener("click", e => {
       e.preventDefault();
       registerForm.classList.add("d-none");
@@ -138,7 +138,7 @@
       msgBox.textContent = "";
     });
 
-    /* --- 事件監聽：註冊表單提交 --- */
+    /*事件監聽：註冊表單提交*/
     registerForm.addEventListener("submit", e => {
       e.preventDefault();
       const username = document.getElementById("regUsername").value.trim();
@@ -167,7 +167,7 @@
       loginForm.classList.remove("d-none");
     });
 
-    /* --- 事件監聽：登入表單提交 --- */
+    /*事件監聽：登入表單提交*/
     loginForm.addEventListener("submit", e => {
       e.preventDefault();
       const username = document.getElementById("loginUsername").value.trim();
@@ -193,18 +193,18 @@
       loadUserData();
     });
 
-    /* --- 事件監聽：點擊「登出」按鈕 --- */
+    /*事件監聽：點擊「登出」按鈕*/
     document.getElementById("logoutBtn").addEventListener("click", () => {
       localStorage.removeItem("currentUser");
       showPage('loginPage'); // 切換回登入頁面
     });
 
-    /* --- 事件監聽：點擊「切換深色模式」按鈕 --- */
+    /*事件監聽：點擊「切換深色模式」按鈕*/
     document.getElementById("toggleDark").addEventListener("click", () => {
       document.body.classList.toggle("dark-mode");
     });
 
-    /* --- 事件監聽：點擊「刪除所有紀錄」按鈕 --- */
+    /*事件監聽：點擊「刪除所有紀錄」按鈕*/
     document.getElementById("deleteRecordsBtn").addEventListener("click", () => {
       // 顯示確認對話框
       if (window.confirm("確定要刪除所有電費紀錄嗎？此操作無法復原。")) {
@@ -216,7 +216,7 @@
       }
     });
 
-    /* --- 事件監聽：新增紀錄表單提交 --- */
+    /*事件監聽：新增紀錄表單提交*/
     document.getElementById("recordForm").addEventListener("submit", e => {
       e.preventDefault();
       const month = document.getElementById("recordMonth").value;
@@ -235,7 +235,7 @@
       showRandomTip(); // 新增後顯示新的提示
     });
 
-    /* --- 事件監聽：點擊表格中的「刪除」 --- */
+    /* 事件監聽：點擊表格中的「刪除」*/
     // 這是「事件委派」(Event Delegation)，監聽整個 tbody
     recordTableBody.addEventListener("click", e => {
       // 判斷被點擊的是否為「刪除」按鈕
@@ -254,7 +254,7 @@
       }
     });
 
-    /* --- Chart.js 圖表初始化 --- */
+    /*Chart.js 圖表初始化*/
     const ctx = document.getElementById("usageChart").getContext("2d");
     const usageChart = new Chart(ctx, {
       type: "line", // 設定為折線圖
@@ -290,7 +290,7 @@
       }
     });
 
-    /* --- 程式進入點：檢查是否已登入 --- */
+    /*程式進入點：檢查是否已登入*/
     // 當頁面載入時，檢查 localStorage 是否有 'currentUser'
     if (localStorage.getItem("currentUser")) {
       // 如果有，表示已登入
